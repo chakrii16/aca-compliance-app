@@ -5,8 +5,18 @@ document.addEventListener("DOMContentLoaded", () => {
     lucide.createIcons();
   }
 
-  // Start on Splash Screen
-  navigateTo('view-1-splash');
+  // Restore Active View from URL Hash or localStorage on Page Refresh
+  const hashView = window.location.hash ? window.location.hash.replace('#', '') : null;
+  const savedView = localStorage.getItem('aca_saved_active_view');
+  const initialView = hashView || savedView || 'view-1-splash';
+
+  // Restore Active Role if saved
+  const savedRole = localStorage.getItem('aca_active_role');
+  if (savedRole && ACA_ROLES[savedRole]) {
+    ACA_ROLES.activeRole = savedRole;
+  }
+
+  navigateTo(initialView, true);
 
   // Initialize shared tables
   renderDocumentsTable();
@@ -25,11 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
   initSignatureCanvas();
 });
 
-// ROUTER & NAVIGATION STACK HISTORY WITH HARDWARE BACK BUTTON GESTURES
+// ROUTER & NAVIGATION STACK HISTORY WITH PERSISTENT URL HASH & REFRESH RECOVERY
 let navigationHistoryStack = [];
 let currentActiveView = 'view-1-splash';
 
 function navigateTo(viewId, isGoingBack = false) {
+  if (!viewId) return;
+
   if (!isGoingBack && currentActiveView && currentActiveView !== viewId) {
     navigationHistoryStack.push(currentActiveView);
     try {
@@ -37,8 +49,19 @@ function navigateTo(viewId, isGoingBack = false) {
     } catch (err) {
       console.log("History push state:", err);
     }
+  } else {
+    try {
+      window.history.replaceState({ viewId: viewId }, '', '#' + viewId);
+    } catch (err) {
+      console.log("History replace state:", err);
+    }
   }
+
   currentActiveView = viewId;
+  localStorage.setItem('aca_saved_active_view', viewId);
+  if (ACA_ROLES && ACA_ROLES.activeRole) {
+    localStorage.setItem('aca_active_role', ACA_ROLES.activeRole);
+  }
 
   const allViews = [
     'view-1-splash', 'view-2-choose-role', 'view-2-welcome', 'view-3-signup', 'view-3-signup-ca', 'view-3-signup-agency', 'view-4-idverify',
@@ -149,6 +172,13 @@ window.addEventListener('popstate', function(event) {
     navigateTo(event.state.viewId, true);
   } else if (navigationHistoryStack.length > 0) {
     goBack();
+  }
+});
+
+window.addEventListener('hashchange', function() {
+  const newHashView = window.location.hash ? window.location.hash.replace('#', '') : null;
+  if (newHashView && newHashView !== currentActiveView) {
+    navigateTo(newHashView, true);
   }
 });
 
