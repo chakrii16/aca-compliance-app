@@ -1938,7 +1938,7 @@ async function runTaxCalculatorExecution() {
   const isInclusive = modeRadio ? modeRadio.value === 'inclusive' : false;
 
   if (amountLabel) {
-    amountLabel.textContent = isInclusive ? "Base Transaction Amount (Before Tax)" : "Total Transaction Amount (Tax Included)";
+    amountLabel.textContent = isInclusive ? "Total Transaction Amount (Tax Included)" : "Base Transaction Amount (Before Tax)";
   }
 
   try {
