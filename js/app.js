@@ -2010,9 +2010,9 @@ async function runTaxCalculatorExecution() {
 
     if (titleEl) titleEl.textContent = `STATUTORY ${res.country} ${res.state ? '(' + res.state + ')' : ''} TAX ASSESSMENT`;
     if (badgeEl) badgeEl.textContent = `Tax Rate: ${(res.tax_rate * 100).toFixed(2)}% (Python REST API Connected)`;
-    if (baseValEl) baseValEl.textContent = `${symbol}${res.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-    if (taxValEl) taxValEl.textContent = `${symbol}${res.tax_amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-    if (totalValEl) totalValEl.textContent = `${symbol}${res.total_amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    if (baseValEl) baseValEl.textContent = `${symbol}${res.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    if (taxValEl) taxValEl.textContent = `${symbol}${res.tax_amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    if (totalValEl) totalValEl.textContent = `${symbol}${res.total_amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     if (splitEl) {
       if (country === 'INDIA') {
