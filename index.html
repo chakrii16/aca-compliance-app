@@ -39,6 +39,10 @@
         <span class="badge-dot" id="header-notif-red-dot"></span>
       </button>
 
+      <button class="nav-icon-btn" onclick="openTaxCalculatorModal()" title="Statutory Tax Calculator (USA, Canada, India)">
+        <i data-lucide="calculator" style="width:18px; height:18px; color: var(--royal-blue);"></i>
+      </button>
+
       <button class="nav-icon-btn" onclick="navigateTo('view-8-aichat')" title="Ask AI Assistant">
         <i data-lucide="sparkles" style="width:18px; height:18px; color: var(--ai-accent-blue);"></i>
       </button>
@@ -2347,8 +2351,82 @@
   </div>
 </div>
 
+<!-- STATUTORY STATE & CROSS-BORDER TAX CALCULATOR MODAL -->
+<div id="modal-tax-calculator" class="modal-overlay hidden-screen" onclick="if(event.target===this) closeTaxCalculatorModal()">
+  <div class="aca-card modal-box" style="max-width: 620px; padding: 36px; position:relative;">
+    <button class="modal-close-btn" onclick="closeTaxCalculatorModal()">&times;</button>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
+      <div style="width:48px; height:48px; border-radius:14px; background:rgba(30,90,146,0.12); color:var(--royal-blue); display:flex; align-items:center; justify-content:center;">
+        <i data-lucide="calculator" style="width:26px; height:26px;"></i>
+      </div>
+      <div>
+        <h3 class="h3-text">State & Cross-Border Statutory Tax Calculator</h3>
+        <p class="small-text" style="color:var(--secondary-text);">Calculate exact statutory tax rates for USA, Canada, and India.</p>
+      </div>
+    </div>
+
+    <form onsubmit="event.preventDefault(); runTaxCalculatorExecution();">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label">Select Country</label>
+          <select id="tax-calc-country" class="form-input" onchange="updateTaxCalcStateOptions()">
+            <option value="USA" selected>USA 🇺🇸 (State Sales Tax)</option>
+            <option value="CANADA">Canada 🇨🇦 (GST / HST / PST)</option>
+            <option value="INDIA">India 🇮🇳 (GST 18% CGST/SGST)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0;" id="tax-calc-state-group">
+          <label class="form-label" id="tax-calc-state-label">State / Province</label>
+          <select id="tax-calc-state" class="form-input" onchange="runTaxCalculatorExecution()">
+            <!-- Dynamic state/province options injected via JS -->
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:24px;">
+        <label class="form-label">Base Transaction Amount ($ / ₹)</label>
+        <input type="number" step="0.01" id="tax-calc-amount" class="form-input" value="1000.00" placeholder="e.g. 1000.00" oninput="runTaxCalculatorExecution()">
+      </div>
+
+      <!-- CALCULATION RESULTS CARD -->
+      <div style="background:var(--light-bg); border:1px solid var(--borders); padding:20px; border-radius:var(--radius-lg); margin-bottom:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--borders); padding-bottom:10px;">
+          <span class="caption-text" style="font-weight:700;" id="tax-calc-result-title">TAX BREAKDOWN SUMMARY</span>
+          <span style="padding:4px 10px; border-radius:12px; font-size:12px; font-weight:700; background:rgba(30,90,146,0.12); color:var(--royal-blue);" id="tax-calc-rate-badge">Rate: 7.25%</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div>
+            <span class="caption-text">BASE AMOUNT</span>
+            <div style="font-size:18px; font-weight:700; color:var(--primary-navy);" id="tax-calc-base-val">$1,000.00</div>
+          </div>
+          <div>
+            <span class="caption-text">STATUTORY TAX AMOUNT</span>
+            <div style="font-size:18px; font-weight:800; color:var(--warning);" id="tax-calc-tax-val">$72.50</div>
+          </div>
+        </div>
+
+        <div id="tax-calc-split-details" style="font-size:13px; color:var(--secondary-text); background:white; padding:10px 14px; border-radius:var(--radius-md); margin-bottom:12px; display:none;">
+          <!-- CGST / SGST or PST / HST breakdown details -->
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--borders); padding-top:10px;">
+          <span class="body-text" style="font-weight:700; color:var(--primary-navy);">TOTAL INVOICED / OWED:</span>
+          <span style="font-size:24px; font-weight:800; color:var(--success);" id="tax-calc-total-val">$1,072.50</span>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px;">
+        <button type="button" class="btn-secondary" style="flex:1;" onclick="closeTaxCalculatorModal()">Close</button>
+        <button type="button" class="btn-primary" style="flex:1; background:var(--royal-blue);" onclick="applyTaxCalcToReturn()"><i data-lucide="check-circle"></i> Apply to Active Return</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- SCRIPTS -->
-<script src="js/mockData.js?v=20260805_v15"></script>
-<script src="js/app.js?v=20260805_v15"></script>
+<script src="js/mockData.js?v=20260805_v16"></script>
+<script src="js/app.js?v=20260805_v16"></script>
 </body>
 </html>

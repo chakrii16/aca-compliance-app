@@ -1841,3 +1841,163 @@ function autoPopulateCustomerTaxReturn() {
     if (window.lucide) lucide.createIcons();
   }, 800);
 }
+
+// STATUTORY TAX CALCULATOR MODAL HANDLERS
+function openTaxCalculatorModal() {
+  const modal = document.getElementById('modal-tax-calculator');
+  if (!modal) return;
+
+  updateTaxCalcStateOptions();
+  runTaxCalculatorExecution();
+  modal.classList.remove('hidden-screen');
+}
+
+function closeTaxCalculatorModal() {
+  const modal = document.getElementById('modal-tax-calculator');
+  if (modal) modal.classList.add('hidden-screen');
+}
+
+function updateTaxCalcStateOptions() {
+  const countrySelect = document.getElementById('tax-calc-country');
+  const stateSelect = document.getElementById('tax-calc-state');
+  const stateGroup = document.getElementById('tax-calc-state-group');
+  const stateLabel = document.getElementById('tax-calc-state-label');
+
+  if (!countrySelect || !stateSelect) return;
+
+  const country = countrySelect.value;
+
+  if (country === 'INDIA') {
+    if (stateGroup) stateGroup.style.opacity = '0.5';
+    if (stateLabel) stateLabel.textContent = "Region / Tax Slab";
+    stateSelect.innerHTML = `<option value="ALL">Nationwide 18% GST (9% CGST + 9% SGST)</option>`;
+    stateSelect.disabled = true;
+  } else {
+    if (stateGroup) stateGroup.style.opacity = '1';
+    stateSelect.disabled = false;
+
+    if (country === 'USA') {
+      if (stateLabel) stateLabel.textContent = "USA State";
+      const states = ACA_TAX_RATES['USA'];
+      const nameMap = ACA_STATE_NAMES['USA'];
+
+      const codeToName = {};
+      Object.keys(nameMap).forEach(k => {
+        const code = nameMap[k];
+        if (!codeToName[code] || k.length > codeToName[code].length) {
+          codeToName[code] = k;
+        }
+      });
+
+      const options = Object.keys(states).sort().map(code => {
+        const rate = (states[code] * 100).toFixed(2);
+        const name = codeToName[code] || code;
+        return `<option value="${code}" ${code === 'CA' ? 'selected' : ''}>${name} (${code}) - ${rate}%</option>`;
+      }).join('');
+
+      stateSelect.innerHTML = options;
+    } else if (country === 'CANADA') {
+      if (stateLabel) stateLabel.textContent = "Canadian Province / Territory";
+      const states = ACA_TAX_RATES['CANADA'];
+      const nameMap = ACA_STATE_NAMES['CANADA'];
+
+      const codeToName = {};
+      Object.keys(nameMap).forEach(k => {
+        const code = nameMap[k];
+        if (!codeToName[code] || k.length > codeToName[code].length) {
+          codeToName[code] = k;
+        }
+      });
+
+      const options = Object.keys(states).sort().map(code => {
+        const rate = (states[code] * 100).toFixed(2);
+        const name = codeToName[code] || code;
+        const type = (code === 'ON' || code === 'NB' || code === 'NL' || code === 'NS' || code === 'PE') ? 'HST' : (code === 'QC') ? 'GST+QST' : (code === 'BC' || code === 'MB' || code === 'SK') ? 'GST+PST' : 'GST';
+        return `<option value="${code}" ${code === 'ON' ? 'selected' : ''}>${name} (${code}) - ${rate}% (${type})</option>`;
+      }).join('');
+
+      stateSelect.innerHTML = options;
+    }
+  }
+
+  runTaxCalculatorExecution();
+}
+
+function runTaxCalculatorExecution() {
+  const countrySelect = document.getElementById('tax-calc-country');
+  const stateSelect = document.getElementById('tax-calc-state');
+  const amountInput = document.getElementById('tax-calc-amount');
+
+  if (!countrySelect || !amountInput) return;
+
+  const country = countrySelect.value;
+  const state = country === 'INDIA' ? null : (stateSelect ? stateSelect.value : null);
+  const amount = parseFloat(amountInput.value) || 0;
+
+  try {
+    const res = calculate_tax(country, amount, state);
+
+    const titleEl = document.getElementById('tax-calc-result-title');
+    const badgeEl = document.getElementById('tax-calc-rate-badge');
+    const baseValEl = document.getElementById('tax-calc-base-val');
+    const taxValEl = document.getElementById('tax-calc-tax-val');
+    const totalValEl = document.getElementById('tax-calc-total-val');
+    const splitEl = document.getElementById('tax-calc-split-details');
+
+    const symbol = country === 'INDIA' ? '₹' : '$';
+
+    if (titleEl) titleEl.textContent = `STATUTORY ${res.country} ${res.state ? '(' + res.state + ')' : ''} TAX ASSESSMENT`;
+    if (badgeEl) badgeEl.textContent = `Tax Rate: ${(res.tax_rate * 100).toFixed(2)}%`;
+    if (baseValEl) baseValEl.textContent = `${symbol}${res.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    if (taxValEl) taxValEl.textContent = `${symbol}${res.tax_amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    if (totalValEl) totalValEl.textContent = `${symbol}${res.total_amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+
+    if (splitEl) {
+      if (country === 'INDIA') {
+        const cgst = res.tax_amount / 2;
+        const sgst = res.tax_amount / 2;
+        splitEl.style.display = 'block';
+        splitEl.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>CGST (9.00% Central GST):</span> <strong>₹${cgst.toFixed(2)}</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span>SGST (9.00% State GST):</span> <strong>₹${sgst.toFixed(2)}</strong>
+          </div>
+        `;
+      } else if (country === 'CANADA') {
+        splitEl.style.display = 'block';
+        let breakdownText = "";
+        if (res.state === 'ON' || res.state === 'NS' || res.state === 'NB' || res.state === 'NL' || res.state === 'PE') {
+          breakdownText = `Harmonized Sales Tax (HST 15% / 13%) combined federal + provincial tax rate.`;
+        } else if (res.state === 'QC') {
+          breakdownText = `GST (5%) + QST (9.975%) Quebec Sales Tax combined.`;
+        } else {
+          breakdownText = `GST (5%) + Provincial Sales Tax (PST) combined rate.`;
+        }
+        splitEl.innerHTML = `<div>${breakdownText}</div>`;
+      } else {
+        splitEl.style.display = 'none';
+      }
+    }
+  } catch (err) {
+    console.warn("Tax Calc Error:", err);
+  }
+}
+
+function applyTaxCalcToReturn() {
+  const amountInput = document.getElementById('tax-calc-amount');
+  const countrySelect = document.getElementById('tax-calc-country');
+  const stateSelect = document.getElementById('tax-calc-state');
+
+  const country = countrySelect ? countrySelect.value : 'USA';
+  const state = stateSelect ? stateSelect.value : 'CA';
+  const amount = parseFloat(amountInput.value) || 0;
+
+  const res = calculate_tax(country, amount, state);
+
+  alert(`✓ Statutory Tax Calculation (${res.country} ${res.state || ''}) Applied to Return!\nBase: $${res.amount.toFixed(2)} | Tax (${(res.tax_rate*100).toFixed(2)}%): $${res.tax_amount.toFixed(2)} | Total: $${res.total_amount.toFixed(2)}`);
+
+  closeTaxCalculatorModal();
+  updateCustomerDashboardValues();
+}
