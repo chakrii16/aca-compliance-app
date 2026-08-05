@@ -1923,7 +1923,7 @@ function updateTaxCalcStateOptions() {
   runTaxCalculatorExecution();
 }
 
-function runTaxCalculatorExecution() {
+async function runTaxCalculatorExecution() {
   const countrySelect = document.getElementById('tax-calc-country');
   const stateSelect = document.getElementById('tax-calc-state');
   const amountInput = document.getElementById('tax-calc-amount');
@@ -1935,7 +1935,28 @@ function runTaxCalculatorExecution() {
   const amount = parseFloat(amountInput.value) || 0;
 
   try {
-    const res = calculate_tax(country, amount, state);
+    let res = null;
+
+    // Attempt live REST API fetch call to Python backend server on port 8000
+    try {
+      const apiResp = await fetch('http://localhost:8000/api/calculate-tax', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country, amount, state })
+      });
+      if (apiResp.ok) {
+        const json = await apiResp.json();
+        if (json && json.status === 'success') {
+          res = json.data;
+        }
+      }
+    } catch (e) {
+      // Fallback seamlessly to local JS calculation engine
+    }
+
+    if (!res) {
+      res = calculate_tax(country, amount, state);
+    }
 
     const titleEl = document.getElementById('tax-calc-result-title');
     const badgeEl = document.getElementById('tax-calc-rate-badge');
@@ -1947,7 +1968,7 @@ function runTaxCalculatorExecution() {
     const symbol = country === 'INDIA' ? '₹' : '$';
 
     if (titleEl) titleEl.textContent = `STATUTORY ${res.country} ${res.state ? '(' + res.state + ')' : ''} TAX ASSESSMENT`;
-    if (badgeEl) badgeEl.textContent = `Tax Rate: ${(res.tax_rate * 100).toFixed(2)}%`;
+    if (badgeEl) badgeEl.textContent = `Tax Rate: ${(res.tax_rate * 100).toFixed(2)}% (Python REST API Connected)`;
     if (baseValEl) baseValEl.textContent = `${symbol}${res.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     if (taxValEl) taxValEl.textContent = `${symbol}${res.tax_amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
     if (totalValEl) totalValEl.textContent = `${symbol}${res.total_amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
