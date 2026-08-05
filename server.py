@@ -1,6 +1,23 @@
 import json
+import os
+import urllib.request
+import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import parse_qs, urlparse
+
+# Load .env variables dynamically
+def load_env_file():
+    env_path = os.path.join(os.path.dirname(__file__), '.env')
+    if os.path.exists(env_path):
+        with open(env_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    k, v = line.split('=', 1)
+                    os.environ[k.strip()] = v.strip()
+
+load_env_file()
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
 
 TAX_RATES = {
     "USA": {
@@ -94,6 +111,50 @@ def calculate_tax(country, amount, state=None, is_inclusive=False):
         "is_inclusive": is_inclusive
     }
 
+def call_groq_ai_chat(user_message, role="Customer"):
+    api_key = os.environ.get('GROQ_API_KEY', '').strip()
+    if not api_key:
+        raise ValueError("GROQ_API_KEY is not configured in .env file.")
+
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    
+    system_prompt = (
+        "You are ACA (Autonomous Compliance Assistant), an expert AI tax and statutory compliance assistant. "
+        "You specialize in Canada (CRA T1/T2, RRSP, GST/HST, T1135 cross-border), USA (IRS 1040, W2, 1099, state taxes), "
+        "and India (18% GST with CGST/SGST split and ₹5 Lakhs threshold). "
+        "Provide direct, professional, clear, and actionable tax advice in bullet points or short paragraphs."
+    )
+
+    payload = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message}
+        ],
+        "temperature": 0.5,
+        "max_tokens": 512
+    }
+
+    req_data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(
+        url,
+        data=req_data,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        },
+        method="POST"
+    )
+
+    with urllib.request.urlopen(req, timeout=15) as response:
+        res_body = response.read().decode('utf-8')
+        res_json = json.loads(res_body)
+        choices = res_json.get("choices", [])
+        if choices:
+            reply = choices[0].get("message", {}).get("content", "").strip()
+            return reply
+        raise ValueError("Empty response received from Groq Llama AI engine.")
+
 class TaxAPIHandler(BaseHTTPRequestHandler):
     def _set_cors_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -129,6 +190,33 @@ class TaxAPIHandler(BaseHTTPRequestHandler):
                 self._set_cors_headers()
                 self.end_headers()
                 self.wfile.write(json.dumps({"status": "error", "message": str(e)}).encode('utf-8'))
+        elif parsed.path == '/api/chat-ai':
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8'))
+                user_msg = data.get('message', '')
+                user_role = data.get('role', 'Customer')
+                ai_reply = call_groq_ai_chat(user_msg, user_role)
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self._set_cors_headers()
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "status": "success",
+                    "reply": ai_reply,
+                    "model": "Groq Llama-3.3 70B"
+                }).encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self._set_cors_headers()
+                self.end_headers()
+                self.wfile.write(json.dumps({
+                    "status": "error",
+                    "message": str(e)
+                }).encode('utf-8'))
         else:
             self.send_response(404)
             self.end_headers()
@@ -140,7 +228,11 @@ class TaxAPIHandler(BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'application/json')
             self._set_cors_headers()
             self.end_headers()
-            self.wfile.write(json.dumps({"status": "healthy", "service": "ACA Python Tax API"}).encode('utf-8'))
+            self.wfile.write(json.dumps({
+                "status": "healthy",
+                "service": "ACA Python Tax & Groq AI API",
+                "groq_configured": bool(GROQ_API_KEY)
+            }).encode('utf-8'))
         else:
             self.send_response(404)
             self.end_headers()
@@ -148,5 +240,5 @@ class TaxAPIHandler(BaseHTTPRequestHandler):
 if __name__ == '__main__':
     server_address = ('', 8000)
     httpd = HTTPServer(server_address, TaxAPIHandler)
-    print("ACA Python Tax REST API Server running on port 8000...")
+    print("ACA Python Tax & Groq AI REST API Server running on port 8000...")
     httpd.serve_forever()
