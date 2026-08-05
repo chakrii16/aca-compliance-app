@@ -2,6 +2,7 @@ import json
 import os
 import urllib.request
 import urllib.parse
+import urllib.error
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import parse_qs, urlparse
 
@@ -141,19 +142,25 @@ def call_groq_ai_chat(user_message, role="Customer"):
         data=req_data,
         headers={
             "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ACA-Tax-Assistant/1.0"
         },
         method="POST"
     )
 
-    with urllib.request.urlopen(req, timeout=15) as response:
-        res_body = response.read().decode('utf-8')
-        res_json = json.loads(res_body)
-        choices = res_json.get("choices", [])
-        if choices:
-            reply = choices[0].get("message", {}).get("content", "").strip()
-            return reply
-        raise ValueError("Empty response received from Groq Llama AI engine.")
+    try:
+        with urllib.request.urlopen(req, timeout=15) as response:
+            res_body = response.read().decode('utf-8')
+            res_json = json.loads(res_body)
+            choices = res_json.get("choices", [])
+            if choices:
+                reply = choices[0].get("message", {}).get("content", "").strip()
+                return reply
+            raise ValueError("Empty response received from Groq Llama AI engine.")
+    except urllib.error.HTTPError as err:
+        err_msg = err.read().decode('utf-8')
+        print(f"Groq API HTTP Error {err.code}: {err_msg}")
+        raise ValueError(f"Groq API Error ({err.code}): {err_msg}")
 
 class TaxAPIHandler(BaseHTTPRequestHandler):
     def _set_cors_headers(self):
