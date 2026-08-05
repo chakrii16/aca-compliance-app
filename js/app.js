@@ -1184,6 +1184,49 @@ function clearChat() {
   }
 }
 
+// BROWSER VOICE RECOGNITION (SPEECH-TO-TEXT) HANDLER
+function startVoiceRecognition() {
+  const input = document.getElementById('chat-input-field');
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    alert("Speech recognition is not supported in this browser. You can type your question in the text box.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+
+  const micBtn = document.getElementById('mic-voice-btn');
+  if (micBtn) micBtn.style.color = '#FF4757';
+
+  recognition.onstart = function() {
+    if (input) input.placeholder = "🎤 Listening... Speak your tax question now...";
+  };
+
+  recognition.onresult = function(event) {
+    const transcript = event.results[0][0].transcript;
+    if (input) {
+      input.value = transcript;
+      input.placeholder = "Ask ACA anything...";
+    }
+    if (micBtn) micBtn.style.color = '';
+    sendChatMessage();
+  };
+
+  recognition.onerror = function() {
+    if (input) input.placeholder = "Ask ACA anything...";
+    if (micBtn) micBtn.style.color = '';
+  };
+
+  recognition.onend = function() {
+    if (micBtn) micBtn.style.color = '';
+  };
+
+  recognition.start();
+}
+
 // SHARED ECOSYSTEM RENDER FUNCTIONS
 function renderDirectMessages() {
   const threadsContainer = document.getElementById('direct-messages-threads-list');

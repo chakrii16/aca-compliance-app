@@ -835,7 +835,7 @@
 
           <div class="chat-input-area">
             <button class="nav-icon-btn" title="Upload Document" onclick="navigateTo('view-9-uploaddocs')"><i data-lucide="paperclip"></i></button>
-            <button class="nav-icon-btn" title="Voice Input" onclick="alert('Voice recognition listening...')"><i data-lucide="mic"></i></button>
+            <button class="nav-icon-btn" id="mic-voice-btn" title="Voice Input (Speech-to-Text)" onclick="startVoiceRecognition()"><i data-lucide="mic"></i></button>
             <input type="text" id="chat-input-field" class="form-input" style="height:48px;" placeholder="Ask ACA anything..." onkeypress="if(event.key==='Enter') sendChatMessage()">
             <button class="btn-primary" style="height:48px; padding:0 24px;" onclick="sendChatMessage()">Send <i data-lucide="send"></i></button>
           </div>
