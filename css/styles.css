@@ -46,6 +46,12 @@
   padding: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
+  caret-color: transparent;
+}
+
+/* Re-enable text input caret exclusively in editable inputs & textareas */
+input, textarea, select, [contenteditable="true"] {
+  caret-color: auto !important;
 }
 
 body {
