@@ -2378,10 +2378,10 @@
         <label class="form-label">Tax Calculation Mode</label>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
           <label style="display:flex; align-items:center; gap:8px; background:white; padding:10px 14px; border-radius:var(--radius-md); border:1px solid var(--borders); font-size:13px; font-weight:600; cursor:pointer;">
-            <input type="radio" name="tax-calc-mode" value="exclusive" checked onchange="runTaxCalculatorExecution()"> Add Tax On Top (+ Tax)
+            <input type="radio" name="tax-calc-mode" value="inclusive" checked onchange="runTaxCalculatorExecution()"> Tax Inclusive
           </label>
           <label style="display:flex; align-items:center; gap:8px; background:white; padding:10px 14px; border-radius:var(--radius-md); border:1px solid var(--borders); font-size:13px; font-weight:600; cursor:pointer;">
-            <input type="radio" name="tax-calc-mode" value="inclusive" onchange="runTaxCalculatorExecution()"> Deduct Tax From Base (- Tax)
+            <input type="radio" name="tax-calc-mode" value="exclusive" onchange="runTaxCalculatorExecution()"> Tax Exclusive
           </label>
         </div>
       </div>

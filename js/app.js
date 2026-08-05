@@ -1969,7 +1969,7 @@ async function runTaxCalculatorExecution() {
   const country = countrySelect.value;
   const state = country === 'INDIA' ? null : (stateSelect ? stateSelect.value : null);
   const amount = parseFloat(amountInput.value) || 0;
-  const isInclusive = modeRadio ? modeRadio.value === 'inclusive' : false;
+  const isInclusive = modeRadio ? modeRadio.value === 'inclusive' : true;
 
   if (amountLabel) {
     amountLabel.textContent = "Base Transaction Amount (Before Tax)";
