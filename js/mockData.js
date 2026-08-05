@@ -379,7 +379,7 @@ function calculate_tax(country, amount, state = null, isInclusive = false) {
   let rate = 0;
 
   if (c === "INDIA") {
-    rate = ACA_TAX_RATES["INDIA"]["ALL"];
+    rate = amount >= 500000 ? ACA_TAX_RATES["INDIA"]["ALL"] : 0.0;
   } else {
     if (!state) {
       throw new Error(`State/Province is required for ${c}.`);

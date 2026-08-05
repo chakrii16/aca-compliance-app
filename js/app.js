@@ -2020,17 +2020,21 @@ async function runTaxCalculatorExecution() {
 
     if (splitEl) {
       if (country === 'INDIA') {
-        const cgst = res.tax_amount / 2;
-        const sgst = res.tax_amount / 2;
         splitEl.style.display = 'block';
-        splitEl.innerHTML = `
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span>CGST (9.00% Central GST):</span> <strong>₹${cgst.toFixed(2)}</strong>
-          </div>
-          <div style="display:flex; justify-content:space-between;">
-            <span>SGST (9.00% State GST):</span> <strong>₹${sgst.toFixed(2)}</strong>
-          </div>
-        `;
+        if (res.tax_amount === 0) {
+          splitEl.innerHTML = `<div style="color:var(--success); font-weight:600;">✓ Tax Exempt: Amount is under ₹5,00,000 (5 Lakhs) threshold. Statutory Tax = ₹0.00</div>`;
+        } else {
+          const cgst = res.tax_amount / 2;
+          const sgst = res.tax_amount / 2;
+          splitEl.innerHTML = `
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span>CGST (9.00% Central GST):</span> <strong>₹${cgst.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span>SGST (9.00% State GST):</span> <strong>₹${sgst.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+            </div>
+          `;
+        }
       } else if (country === 'CANADA') {
         splitEl.style.display = 'block';
         let breakdownText = "";

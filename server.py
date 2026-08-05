@@ -66,7 +66,7 @@ def calculate_tax(country, amount, state=None, is_inclusive=False):
         raise ValueError(f"Country '{country}' is not supported.")
     
     if country == "INDIA":
-        rate = TAX_RATES["INDIA"]["ALL"]
+        rate = TAX_RATES["INDIA"]["ALL"] if amount >= 500000 else 0.0
     else:
         if not state:
             raise ValueError(f"State/Province is required for {country}.")
