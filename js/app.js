@@ -1961,7 +1961,6 @@ async function runTaxCalculatorExecution() {
   const countrySelect = document.getElementById('tax-calc-country');
   const stateSelect = document.getElementById('tax-calc-state');
   const amountInput = document.getElementById('tax-calc-amount');
-  const modeRadio = document.querySelector('input[name="tax-calc-mode"]:checked');
   const amountLabel = document.getElementById('tax-calc-amount-label');
 
   if (!countrySelect || !amountInput) return;
@@ -1969,7 +1968,7 @@ async function runTaxCalculatorExecution() {
   const country = countrySelect.value;
   const state = country === 'INDIA' ? null : (stateSelect ? stateSelect.value : null);
   const amount = parseFloat(amountInput.value) || 0;
-  const isInclusive = modeRadio ? modeRadio.value === 'inclusive' : true;
+  const isInclusive = true;
 
   if (amountLabel) {
     amountLabel.textContent = "Base Transaction Amount (Before Tax)";
@@ -1977,7 +1976,7 @@ async function runTaxCalculatorExecution() {
 
   const totalLabelEl = document.getElementById('tax-calc-total-label');
   if (totalLabelEl) {
-    totalLabelEl.textContent = isInclusive ? "TOTAL AFTER TAX DEDUCTION:" : "TOTAL INVOICED / OWED:";
+    totalLabelEl.textContent = "TOTAL INVOICED / OWED:";
   }
 
   try {
