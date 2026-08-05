@@ -1130,3 +1130,62 @@ body.dark-mode .aca-card-ai .btn-secondary {
   50% { top: 95%; }
   100% { top: 0%; }
 }
+
+/* FLOATING CIRCULAR AI ASSISTANT ACTION BUTTON (BOTTOM RIGHT CORNER) */
+.floating-ai-fab {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--royal-blue) 0%, #2FA7E5 100%);
+  border: 2.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 25px rgba(30, 90, 146, 0.4), 0 0 20px rgba(47, 167, 229, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 250ms ease;
+}
+
+.floating-ai-fab:hover {
+  transform: scale(1.12) translateY(-4px);
+  box-shadow: 0 16px 36px rgba(30, 90, 146, 0.5), 0 0 30px rgba(47, 167, 229, 0.6);
+}
+
+.floating-ai-fab:active {
+  transform: scale(0.95);
+}
+
+.fab-pulse-ring {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--ai-accent-blue);
+  opacity: 0.75;
+  animation: fabPulse 2.4s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+  pointer-events: none;
+}
+
+@keyframes fabPulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.25); opacity: 0; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+.fab-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #FF4757;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}

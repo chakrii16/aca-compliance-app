@@ -11,7 +11,6 @@ const ACA_ROLES = {
       { id: "nav-v7", name: "Home", icon: "layout-dashboard", targetView: "view-7-dashboard" },
       { id: "nav-v9", name: "Documents", icon: "file-text", targetView: "view-9-uploaddocs" },
       { id: "nav-tax-calc", name: "TAX Calculator", icon: "calculator", targetModal: "modal-tax-calculator" },
-      { id: "nav-v8", name: "AI Assistant", icon: "bot", targetView: "view-8-aichat", badge: "24/7" },
       { id: "nav-v11", name: "Tax Filing", icon: "calculator", targetView: "view-11-results" },
       { id: "nav-v12", name: "Compliance", icon: "shield-check", targetView: "view-12-compliance" },
       { id: "nav-v17", name: "Reports", icon: "bar-chart-3", targetView: "view-17-reports" },
@@ -92,7 +91,6 @@ const ACA_ROLES = {
       { id: "nav-tax-calc", name: "TAX Calculator", icon: "calculator", targetModal: "modal-tax-calculator" },
       { id: "nav-am-ret", name: "Returns", icon: "file-spreadsheet", targetView: "view-ca-returns" },
       { id: "nav-msg", name: "Messages", icon: "message-square", targetView: "view-messages", badge: "2 New" },
-      { id: "nav-v8", name: "AI Assistant", icon: "bot", targetView: "view-8-aichat", badge: "Staff" },
       { id: "nav-v17", name: "Reports", icon: "bar-chart-3", targetView: "view-17-reports" }
     ],
     kpis: [
