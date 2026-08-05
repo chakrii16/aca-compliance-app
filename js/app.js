@@ -1927,12 +1927,19 @@ async function runTaxCalculatorExecution() {
   const countrySelect = document.getElementById('tax-calc-country');
   const stateSelect = document.getElementById('tax-calc-state');
   const amountInput = document.getElementById('tax-calc-amount');
+  const modeRadio = document.querySelector('input[name="tax-calc-mode"]:checked');
+  const amountLabel = document.getElementById('tax-calc-amount-label');
 
   if (!countrySelect || !amountInput) return;
 
   const country = countrySelect.value;
   const state = country === 'INDIA' ? null : (stateSelect ? stateSelect.value : null);
   const amount = parseFloat(amountInput.value) || 0;
+  const isInclusive = modeRadio ? modeRadio.value === 'inclusive' : false;
+
+  if (amountLabel) {
+    amountLabel.textContent = isInclusive ? "Total Transaction Amount (Tax Included)" : "Base Transaction Amount (Before Tax)";
+  }
 
   try {
     let res = null;
@@ -1942,7 +1949,7 @@ async function runTaxCalculatorExecution() {
       const apiResp = await fetch('http://localhost:8000/api/calculate-tax', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ country, amount, state })
+        body: JSON.stringify({ country, amount, state, is_inclusive: isInclusive })
       });
       if (apiResp.ok) {
         const json = await apiResp.json();
@@ -1955,7 +1962,7 @@ async function runTaxCalculatorExecution() {
     }
 
     if (!res) {
-      res = calculate_tax(country, amount, state);
+      res = calculate_tax(country, amount, state, isInclusive);
     }
 
     const titleEl = document.getElementById('tax-calc-result-title');

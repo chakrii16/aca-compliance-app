@@ -370,7 +370,7 @@ const ACA_STATE_NAMES = {
   }
 };
 
-function calculate_tax(country, amount, state = null) {
+function calculate_tax(country, amount, state = null, isInclusive = false) {
   if (!country) throw new Error("Country is required.");
   const c = country.toUpperCase();
 
@@ -398,15 +398,27 @@ function calculate_tax(country, amount, state = null) {
     rate = ACA_TAX_RATES[c][s];
   }
 
-  const tax_amount = amount * rate;
-  const total_amount = amount + tax_amount;
+  let base_amount = amount;
+  let tax_amount = 0;
+  let total_amount = amount;
+
+  if (isInclusive) {
+    base_amount = amount / (1 + rate);
+    tax_amount = amount - base_amount;
+    total_amount = amount;
+  } else {
+    base_amount = amount;
+    tax_amount = amount * rate;
+    total_amount = amount + tax_amount;
+  }
 
   return {
     country: c,
     state: state ? state.toUpperCase() : null,
-    amount: amount,
+    amount: base_amount,
     tax_rate: rate,
     tax_amount: tax_amount,
-    total_amount: total_amount
+    total_amount: total_amount,
+    is_inclusive: isInclusive
   };
 }

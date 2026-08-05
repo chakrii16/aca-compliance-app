@@ -2380,9 +2380,21 @@
         </div>
       </div>
 
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label">Tax Calculation Mode</label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <label style="display:flex; align-items:center; gap:8px; background:white; padding:10px 14px; border-radius:var(--radius-md); border:1px solid var(--borders); font-size:13px; font-weight:600; cursor:pointer;">
+            <input type="radio" name="tax-calc-mode" value="exclusive" checked onchange="runTaxCalculatorExecution()"> Tax Exclusive (Add Tax on top)
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; background:white; padding:10px 14px; border-radius:var(--radius-md); border:1px solid var(--borders); font-size:13px; font-weight:600; cursor:pointer;">
+            <input type="radio" name="tax-calc-mode" value="inclusive" onchange="runTaxCalculatorExecution()"> Tax Inclusive (Extract Tax from total)
+          </label>
+        </div>
+      </div>
+
       <div class="form-group" style="margin-bottom:24px;">
-        <label class="form-label">Base Transaction Amount ($ / ₹)</label>
-        <input type="number" step="0.01" id="tax-calc-amount" class="form-input" value="1000.00" placeholder="e.g. 1000.00" oninput="runTaxCalculatorExecution()">
+        <label class="form-label" id="tax-calc-amount-label">Base Transaction Amount ($ / ₹)</label>
+        <input type="number" step="0.01" id="tax-calc-amount" class="form-input" value="1200000.00" placeholder="e.g. 1000.00" oninput="runTaxCalculatorExecution()">
       </div>
 
       <!-- CALCULATION RESULTS CARD -->

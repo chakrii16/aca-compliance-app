@@ -60,7 +60,7 @@ STATE_NAMES = {
     }
 }
 
-def calculate_tax(country, amount, state=None):
+def calculate_tax(country, amount, state=None, is_inclusive=False):
     country = country.upper()
     if country not in TAX_RATES:
         raise ValueError(f"Country '{country}' is not supported.")
@@ -77,16 +77,23 @@ def calculate_tax(country, amount, state=None):
             raise ValueError(f"State/Province '{state}' is not valid for {country}.")
         rate = TAX_RATES[country][state]
 
-    tax_amount = amount * rate
-    total_amount = amount + tax_amount
+    if is_inclusive:
+        base_amount = amount / (1 + rate)
+        tax_amount = amount - base_amount
+        total_amount = amount
+    else:
+        base_amount = amount
+        tax_amount = amount * rate
+        total_amount = amount + tax_amount
 
     return {
         "country": country,
         "state": state,
-        "amount": amount,
+        "amount": base_amount,
         "tax_rate": rate,
         "tax_amount": tax_amount,
-        "total_amount": total_amount
+        "total_amount": total_amount,
+        "is_inclusive": is_inclusive
     }
 
 class TaxAPIHandler(BaseHTTPRequestHandler):
@@ -110,7 +117,8 @@ class TaxAPIHandler(BaseHTTPRequestHandler):
                 country = data.get('country')
                 amount = float(data.get('amount', 0))
                 state = data.get('state')
-                result = calculate_tax(country, amount, state)
+                is_inclusive = bool(data.get('is_inclusive', False))
+                result = calculate_tax(country, amount, state, is_inclusive)
                 
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
