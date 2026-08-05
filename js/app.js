@@ -5,10 +5,14 @@ document.addEventListener("DOMContentLoaded", () => {
     lucide.createIcons();
   }
 
-  // Restore Active View from URL Hash or localStorage on Page Refresh
-  const hashView = window.location.hash ? window.location.hash.replace('#', '') : null;
-  const savedView = localStorage.getItem('aca_saved_active_view');
-  const initialView = hashView || savedView || 'view-1-splash';
+  // Check URL Hash for deep linking (e.g. #view-9-uploaddocs)
+  const hash = window.location.hash ? window.location.hash.replace('#', '').trim() : '';
+  
+  // If URL has a specific view hash (other than splash), load that deep view. Otherwise, start on first splash interface!
+  let initialView = 'view-1-splash';
+  if (hash && hash !== 'view-1-splash') {
+    initialView = hash;
+  }
 
   // Restore Active Role if saved
   const savedRole = localStorage.getItem('aca_active_role');
