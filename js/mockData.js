@@ -15,7 +15,6 @@ const ACA_ROLES = {
       { id: "nav-v12", name: "Compliance", icon: "shield-check", targetView: "view-12-compliance" },
       { id: "nav-v17", name: "Reports", icon: "bar-chart-3", targetView: "view-17-reports" },
       { id: "nav-msg", name: "Messages", icon: "message-square", targetView: "view-messages", badge: "Live" },
-      { id: "nav-v19", name: "Profile", icon: "user", targetView: "view-19-profile" },
       { id: "nav-v20", name: "Settings", icon: "settings", targetView: "view-20-settings" }
     ],
     kpis: [
@@ -53,7 +52,6 @@ const ACA_ROLES = {
       { id: "nav-v17", name: "Reports", icon: "bar-chart-3", targetView: "view-17-reports" },
       { id: "nav-cal", name: "Calendar", icon: "calendar", targetView: "view-calendar" },
       { id: "nav-msg", name: "Messages", icon: "message-square", targetView: "view-messages", badge: "3 New" },
-      { id: "nav-v19", name: "Profile", icon: "user", targetView: "view-19-profile" },
       { id: "nav-v20", name: "Settings", icon: "settings", targetView: "view-20-settings" }
     ],
     kpis: [
@@ -92,8 +90,7 @@ const ACA_ROLES = {
       { id: "nav-am-ret", name: "Returns", icon: "file-spreadsheet", targetView: "view-ca-returns" },
       { id: "nav-msg", name: "Messages", icon: "message-square", targetView: "view-messages", badge: "2 New" },
       { id: "nav-v8", name: "AI Assistant", icon: "bot", targetView: "view-8-aichat", badge: "Staff" },
-      { id: "nav-v17", name: "Reports", icon: "bar-chart-3", targetView: "view-17-reports" },
-      { id: "nav-v19", name: "Profile", icon: "user", targetView: "view-19-profile" }
+      { id: "nav-v17", name: "Reports", icon: "bar-chart-3", targetView: "view-17-reports" }
     ],
     kpis: [
       { title: "Assigned Clients", value: "12 Clients", desc: "Assigned by Firm Admin", icon: "users", color: "var(--royal-blue)", bg: "rgba(30,90,146,0.15)" },
