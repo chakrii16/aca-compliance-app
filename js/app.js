@@ -773,7 +773,7 @@ function renderRoleWorkspace() {
   const sidebarNav = document.getElementById('sidebar-nav-container');
   if (sidebarNav) {
     sidebarNav.innerHTML = roleObj.sidebar.map(item => `
-      <a class="sidebar-link" id="${item.id}" onclick="navigateTo('${item.targetView}')">
+      <a class="sidebar-link" id="${item.id}" onclick="${item.targetModal ? `openTaxCalculatorModal()` : `navigateTo('${item.targetView}')`}">
         <i data-lucide="${item.icon}" style="width:20px; height:20px;"></i>
         <span>${item.name}</span>
         ${item.badge ? `<span class="sidebar-badge">${item.badge}</span>` : ''}
