@@ -1972,7 +1972,12 @@ async function runTaxCalculatorExecution() {
   const isInclusive = modeRadio ? modeRadio.value === 'inclusive' : false;
 
   if (amountLabel) {
-    amountLabel.textContent = isInclusive ? "Base Transaction Amount (Before Tax)" : "Total Transaction Amount (Tax Included)";
+    amountLabel.textContent = "Base Transaction Amount (Before Tax)";
+  }
+
+  const totalLabelEl = document.getElementById('tax-calc-total-label');
+  if (totalLabelEl) {
+    totalLabelEl.textContent = isInclusive ? "TOTAL AFTER TAX DEDUCTION:" : "TOTAL INVOICED / OWED:";
   }
 
   try {

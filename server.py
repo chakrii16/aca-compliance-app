@@ -77,13 +77,12 @@ def calculate_tax(country, amount, state=None, is_inclusive=False):
             raise ValueError(f"State/Province '{state}' is not valid for {country}.")
         rate = TAX_RATES[country][state]
 
+    base_amount = amount
     tax_amount = amount * rate
     if is_inclusive:
-        base_amount = amount - tax_amount
-        total_amount = amount
+        total_amount = base_amount - tax_amount
     else:
-        base_amount = amount
-        total_amount = amount + tax_amount
+        total_amount = base_amount + tax_amount
 
     return {
         "country": country,

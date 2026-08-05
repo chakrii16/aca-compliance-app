@@ -398,16 +398,14 @@ function calculate_tax(country, amount, state = null, isInclusive = false) {
     rate = ACA_TAX_RATES[c][s];
   }
 
-  let base_amount = amount;
-  let tax_amount = amount * rate;
-  let total_amount = amount;
+  const base_amount = amount;
+  const tax_amount = amount * rate;
+  let total_amount = 0;
 
   if (isInclusive) {
-    base_amount = amount - tax_amount;
-    total_amount = amount;
+    total_amount = base_amount - tax_amount;
   } else {
-    base_amount = amount;
-    total_amount = amount + tax_amount;
+    total_amount = base_amount + tax_amount;
   }
 
   return {
