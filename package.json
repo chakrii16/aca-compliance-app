@@ -1,0 +1,11 @@
+{
+  "name": "aca-tax-compliance-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo 'No build step required for static site'"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^3.0.0"
+  }
+}

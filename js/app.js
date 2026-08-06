@@ -1143,7 +1143,7 @@ async function sendChatMessage() {
   chatBox.scrollTop = chatBox.scrollHeight;
 
   try {
-    const response = await fetch('http://localhost:8000/api/chat-ai', {
+    const response = await fetch('/api/chat-ai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: query, role: roleKey })
@@ -2044,10 +2044,11 @@ async function runTaxCalculatorExecution() {
 
   try {
     let res = null;
+    let isLiveApi = false;
 
-    // Attempt live REST API fetch call to Python backend server on port 8000
+    // Attempt live REST API fetch call to the serverless tax engine
     try {
-      const apiResp = await fetch('http://localhost:8000/api/calculate-tax', {
+      const apiResp = await fetch('/api/calculate-tax', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ country, amount, state, is_inclusive: isInclusive })
@@ -2056,6 +2057,7 @@ async function runTaxCalculatorExecution() {
         const json = await apiResp.json();
         if (json && json.status === 'success') {
           res = json.data;
+          isLiveApi = true;
         }
       }
     } catch (e) {
@@ -2076,7 +2078,7 @@ async function runTaxCalculatorExecution() {
     const symbol = country === 'INDIA' ? '₹' : '$';
 
     if (titleEl) titleEl.textContent = `STATUTORY ${res.country} ${res.state ? '(' + res.state + ')' : ''} TAX ASSESSMENT`;
-    if (badgeEl) badgeEl.textContent = `Tax Rate: ${(res.tax_rate * 100).toFixed(2)}% (Python REST API Connected)`;
+    if (badgeEl) badgeEl.textContent = `Tax Rate: ${(res.tax_rate * 100).toFixed(2)}% (${isLiveApi ? 'Live Tax Engine Connected' : 'Local Tax Engine'})`;
     if (baseValEl) baseValEl.textContent = `${symbol}${res.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     if (taxValEl) taxValEl.textContent = `${symbol}${res.tax_amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     if (totalValEl) totalValEl.textContent = `${symbol}${res.total_amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;

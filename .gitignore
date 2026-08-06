@@ -8,3 +8,9 @@ __pycache__/
 *.pyc
 venv/
 env/
+
+# Node dependencies
+node_modules/
+
+# Local Netlify folder
+.netlify
